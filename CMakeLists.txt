@@ -14,6 +14,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(cmkit/Doxygen)
 
+option(BUILD_DOCS "Build API documentation via Doxygen" OFF)
+
+if(BUILD_DOCS)
+    doxygen_generate(
+        DOXYFILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in"
+        DOXYFILE_OUT "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
+	DOXYGEN_INDEX "${CMAKE_CURRENT_BINARY_DIR}/docs/html/index.html"
+    )
+endif()
+
 set(CMAKE_DEBUG_POSTFIX d)
 add_library(optify)
 add_library(optify::optify ALIAS optify)
