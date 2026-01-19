@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2025 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: CC0-1.0
+
+* text=auto
+
+.gitattributes text
+.gitignore     text
+.clang-format  text
+*.c            text diff=c
+*.yml          text diff=yaml
+*.yaml         text diff=yaml
+*.cmake        text
+*.h            text diff=c
+*.in           text
+*.md           text diff=markdown
+*.toml         text diff=toml
+*.txt          text
