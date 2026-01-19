@@ -15,6 +15,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(cmkit/Doxygen)
 
 option(BUILD_DOCS "Build API documentation via Doxygen" OFF)
+option(ENABLE_TESTS "Enable testing" OFF)
 
 if(BUILD_DOCS)
     doxygen_generate(
@@ -29,8 +30,7 @@ add_library(optify)
 add_library(optify::optify ALIAS optify)
 set_target_properties(
     optify
-    PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR}
-)
+    PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
 target_sources(optify PRIVATE src/optify.c)
 target_compile_features(optify PUBLIC c_std_99)
 target_include_directories(
@@ -89,3 +89,8 @@ install(
     NAMESPACE optify::
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/optify
 )
+
+if(ENABLE_TESTS)
+    add_subdirectory(extern/cmocka)
+    add_subdirectory(tests)
+endif()
