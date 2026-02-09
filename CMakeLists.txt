@@ -14,10 +14,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(cmkit/CompileFlags)
 include(cmkit/StaticAnalysis)
+include(cmkit/Doxygen)
 
 option(WARNINGS_AS_ERRORS "Treat warnings as errors" TRUE)
 option(CLANG_TIDY_CHECK "Lint with clang-tidy" OFF)
 option(RUN_TESTS "Build an run testing framework" OFF)
+option(BUILD_DOCS "Build documentation of the project" OFF)
 
 add_library(warning_flags INTERFACE)
 add_library(optify::warning_flags ALIAS warning_flags)
@@ -115,4 +117,12 @@ if(RUN_TESTS)
         SOURCES "${CMAKE_SOURCE_DIR}/tests/test_foobar.c"
         LINK_LIBRARIES cmocka::cmocka optify::optify optify::warning_flags)
     add_cmocka_test_environment(test_optify_parse)
+endif()
+
+if(BUILD_DOCS)
+    doxygen_generate(
+	    DOXYFILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in"
+	    DOXYFILE_OUT "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile"
+	    DOXYGEN_INDEX "${CMAKE_CURRENT_BINARY_DIR}/docs/html/index.html"
+    )
 endif()
