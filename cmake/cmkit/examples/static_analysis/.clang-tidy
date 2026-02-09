@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2026 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: CC0-1.0
+---
+Checks:          'clang-diagnostic-*,clang-analyzer-*'
+WarningsAsErrors: ''
+HeaderFileExtensions:
+  - ''
+  - h
+  - hh
+  - hpp
+  - hxx
+ImplementationFileExtensions:
+  - c
+  - cc
+  - cpp
+  - cxx
+HeaderFilterRegex: ''
+ExcludeHeaderFilterRegex: ''
+FormatStyle:     none
+User:            awkless
+CheckOptions:    {}
+SystemHeaders:   false
+...
+
