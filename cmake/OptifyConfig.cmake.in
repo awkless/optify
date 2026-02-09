@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: MIT
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/OptifyTargets.cmake")
+check_required_components("@PROJECT_NAME@")
