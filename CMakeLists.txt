@@ -16,6 +16,7 @@ include(cmkit/CompileFlags)
 
 option(WARNINGS_AS_ERRORS "Treat warnings as errors" TRUE)
 option(CLANG_TIDY_CHECK "Lint with clang-tidy" OFF)
+option(RUN_TESTS "Build an run testing framework" OFF)
 
 add_library(warning_flags INTERFACE)
 add_library(optify::warning_flags ALIAS warning_flags)
@@ -92,3 +93,17 @@ install(
     NAMESPACE optify::
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/optify
 )
+
+if(RUN_TESTS)
+    enable_testing()
+    add_subdirectory(extern/cmocka)
+
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/extern/cmocka/cmake/Modules")
+    include(AddCMockaTest)
+
+    add_cmocka_test(
+        test_optify_parse
+        SOURCES "${CMAKE_SOURCE_DIR}/tests/test_foobar.c"
+        LINK_LIBRARIES cmocka::cmocka optify::optify optify::warning_flags)
+    add_cmocka_test_environment(test_optify_parse)
+endif()
