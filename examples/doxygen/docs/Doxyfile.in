@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: MIT
+
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+DOXYFILE_ENCODING     = UTF-8
+PROJECT_NAME          = "@PROJECT_NAME@"
+PROJECT_NUMBER        = "@PROJECT_VERSION@"
+PROJECT_BRIEF         = "@PROJECT_DESCRIPTION@"
+OUTPUT_DIRECTORY      = @CMAKE_CURRENT_BINARY_DIR@/docs/
+TAB_SIZE              = 8
+OPTIMIZE_OUTPUT_FOR_C = YES
+
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+EXTRACT_ALL = YES
+
+#---------------------------------------------------------------------------
+# Configuration options related to the input files
+#---------------------------------------------------------------------------
+INPUT     = @CMAKE_SOURCE_DIR@/src/ \
+            @CMAKE_SOURCE_DIR@/docs/
+RECURSIVE = YES
+
+#---------------------------------------------------------------------------
+# Generation options
+#---------------------------------------------------------------------------
+GENERATE_LATEX = NO
+GENERATE_HTML  = YES
