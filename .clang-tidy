@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*'
+Checks: 'clang-diagnostic-*,clang-analyzer-*,cert-*,readiblity-*,bugprone-*'
 WarningsAsErrors: ''
 HeaderFileExtensions:
   - ''
