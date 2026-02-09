@@ -13,6 +13,7 @@ project(
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(cmkit/CompileFlags)
+include(cmkit/StaticAnalysis)
 
 option(WARNINGS_AS_ERRORS "Treat warnings as errors" TRUE)
 option(CLANG_TIDY_CHECK "Lint with clang-tidy" OFF)
@@ -93,6 +94,14 @@ install(
     NAMESPACE optify::
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/optify
 )
+
+if(CLANG_TIDY_CHECK)
+    lint_with_clang_tidy(
+        "${CMAKE_SOURCE_DIR}/include/optify.h"
+        "${CMAKE_SOURCE_DIR}/src/optify.c"
+        "$<$<BOOL:${RUN_TESTS}>:${CMAKE_SOURCE_DIR}/tests/test_foobar.c>"
+    )
+endif()
 
 if(RUN_TESTS)
     enable_testing()
