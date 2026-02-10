@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2026 Jason Pena <jasonpena@awkless.com>
+# SPDX-License-Identifier: CC0-1.0
+
+name: Run Tests
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ubuntu-latest-gcc
+            os: ubuntu-latest
+            compiler: gcc
+            sudo: true
+          - name: macos-latest-clang
+            os: macos-latest
+            compiler: clang
+            sudo: true
+          - name: windows-latest-msvc
+            os: windows-latest
+            compiler: msvc
+            sudo: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup CPP
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: "${{ matrix.compiler }}"
+          vcvarsall: "${{ contains(matrix.os, 'windows') }}"
+          cmake: true
+          ninja: true
+          vcpkg: false
+          ccache: true
+          cppcheck: false
+          clangtidy: false
+
+      - name: Configure CMake
+        run: >
+          cmake -G Ninja -S . -B build
+          -DWARNINGS_AS_ERRORS=TRUE
+          -DRUN_TESTS=ON
+
+      - name: Build Optify
+        run: cmake --build build
+
+      - name: Run Unit Tests
+        if: runner.os != 'Windows'
+        working-directory: ./build
+        run: ctest --test-dir .
