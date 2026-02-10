@@ -26,7 +26,7 @@ add_library(optify::warning_flags ALIAS warning_flags)
 set_warning_flags(
     warning_flags
     AS_ERRORS "${WARNINGS_AS_ERRORS}"
-    MSVC_WARNINGS /Wall /W4
+    MSVC_WARNINGS /Wall /wd4820
     CLANG_WARNINGS -Wall -Wextra -pedantic
     GNU_WARNINGS -Wall -Wextra -pedantic
 )
