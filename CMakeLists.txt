@@ -98,11 +98,22 @@ install(
 )
 
 if(CLANG_TIDY_CHECK)
-    lint_with_clang_tidy(
+    set(
+        production
         "${CMAKE_SOURCE_DIR}/include/optify.h"
         "${CMAKE_SOURCE_DIR}/src/optify.c"
-        "$<$<BOOL:${RUN_TESTS}>:${CMAKE_SOURCE_DIR}/tests/test_foobar.c>"
     )
+
+    set(
+        testing
+        "${CMAKE_SOURCE_DIR}/tests/test_foobar.c"
+    )
+
+    if(RUN_TESTS)
+        lint_with_clang_tidy("${production}" "${testing}")
+    else()
+        lint_with_clang_tidy("${production}")
+    endif()
 endif()
 
 if(RUN_TESTS)
