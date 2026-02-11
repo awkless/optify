@@ -40,12 +40,13 @@ jobs:
           vcpkg: false
           ccache: true
           cppcheck: false
-          clangtidy: false
+          clangtidy: true
 
       - name: Configure CMake
         run: >
           cmake -G Ninja -S . -B build
           -DWARNINGS_AS_ERRORS=TRUE
+          -DRUN_TESTS=ON
           -DCLANG_TIDY_CHECK=ON
 
       - name: Lint
