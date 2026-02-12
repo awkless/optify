@@ -106,7 +106,7 @@ if(CLANG_TIDY_CHECK)
 
     set(
         testing
-        "${CMAKE_SOURCE_DIR}/tests/test_foobar.c"
+        "${CMAKE_SOURCE_DIR}/tests/test_optify_init.c"
     )
 
     if(RUN_TESTS)
@@ -124,10 +124,10 @@ if(RUN_TESTS)
     include(AddCMockaTest)
 
     add_cmocka_test(
-        test_optify_parse
-        SOURCES "${CMAKE_SOURCE_DIR}/tests/test_foobar.c"
+        test_optify_init
+        SOURCES "${CMAKE_SOURCE_DIR}/tests/test_optify_init.c"
         LINK_LIBRARIES cmocka::cmocka optify::optify optify::warning_flags)
-    add_cmocka_test_environment(test_optify_parse)
+    add_cmocka_test_environment(test_optify_init)
 endif()
 
 if(BUILD_DOCS)

@@ -7,9 +7,14 @@
 int
 optify_init(struct optify *self, char **argv, int argc)
 {
-	(void)self;
-	(void)argc;
-	(void)argv;
+	if (!self || !argv)
+		return -OPTIFY_BAD_API_USE;
+
+	self->argv = argv;
+	self->optarg = NULL;
+	self->errarg = NULL;
+	self->argc = argc;
+	self->optidx = 1;
 
 	return OPTIFY_SUCCESS;
 }
