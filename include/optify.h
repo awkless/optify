@@ -110,7 +110,7 @@ struct optify {
  * \param[in] argc _[immutable copy]_ Number of arguments to parse.
  * \param[in] argv _[mutable reference]_ List of arguments to parse.
  * \return Returns `OPTIFY_SUCCESS` for no errors.
- * \return Returns `-OPTIFY_BAD_API_USE` iff `self` parameter is NULL.
+ * \return Returns `-OPTIFY_BAD_API_USE` iff `self` or `argv` is NULL.
  */
 OPTIFY_EXPORT int
 optify_init(struct optify *self, char **argv, int argc);
