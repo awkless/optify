@@ -143,7 +143,7 @@ optify_init(struct optify *self, char **argv, int argc);
  *         option list.
  */
 OPTIFY_EXPORT int
-optify_parse(struct optify *self, struct optify_option *optlist, size_t optcnt);
+optify_parse(struct optify *self, const struct optify_option *optlist, size_t optcnt);
 
 #ifdef __cplusplus
 } /* extern "C" */

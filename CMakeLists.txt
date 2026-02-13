@@ -128,6 +128,12 @@ if(RUN_TESTS)
         SOURCES "${CMAKE_SOURCE_DIR}/tests/test_optify_init.c"
         LINK_LIBRARIES cmocka::cmocka optify::optify optify::warning_flags)
     add_cmocka_test_environment(test_optify_init)
+
+    add_cmocka_test(
+        test_optify_parse
+        SOURCES "${CMAKE_SOURCE_DIR}/tests/test_optify_parse.c"
+        LINK_LIBRARIES cmocka::cmocka optify::optify optify::warning_flags)
+    add_cmocka_test_environment(test_optify_parse)
 endif()
 
 if(BUILD_DOCS)
