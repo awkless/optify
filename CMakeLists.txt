@@ -10,6 +10,10 @@ project(
     LANGUAGES C
 )
 
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(cmkit/CompileFlags)
@@ -26,8 +30,8 @@ add_library(optify::warning_flags ALIAS warning_flags)
 set_warning_flags(
     warning_flags
     AS_ERRORS "${WARNINGS_AS_ERRORS}"
-    MSVC_WARNINGS /Wall /wd4820
-    CLANG_WARNINGS -Wall -Wextra -pedantic
+    MSVC_WARNINGS /Wall /wd4820 /wd5045
+    CLANG_WARNINGS -Wall -Wextra -pedantic -Wno-gnu-zero-variadic-macro-arguments
     GNU_WARNINGS -Wall -Wextra -pedantic
 )
 
@@ -40,7 +44,6 @@ set_target_properties(
     PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 target_sources(optify PRIVATE src/optify.c)
-target_compile_features(optify PUBLIC c_std_99)
 target_include_directories(
     optify
     PRIVATE src
