@@ -14,10 +14,9 @@
 #include <optify.h>
 
 #define OPTCNT 3
-
 static const struct optify_option optlist_fixture[] = {
-	{ .shortid = 'b', .longid = "bar", .argkind = OPTIFY_NO_ARG },
-	{ .shortid = 'f', .longid = "foo", .argkind = OPTIFY_NO_ARG },
+	{ .shortid = 'v', .longid = "verbosity", .argkind = OPTIFY_OPTIONAL_ARG },
+	{ .shortid = 'c', .longid = "color", .argkind = OPTIFY_REQUIRED_ARG },
 	{ .shortid = 'h', .longid = "help", .argkind = OPTIFY_NO_ARG },
 	OPTIFY_OPTLIST_END
 };
@@ -141,11 +140,11 @@ static void
 catch_known_short_option(void **state)
 {
 	struct parser_state *pstate = *state;
-	char *argv[] = { "test", "foo", "-b", "-f", "bar", "-h", NULL };
+	char *argv[] = { "test", "foo", "-v", "-c", "blue", "-h", NULL };
 	int argc = 6;
 	int status = 0;
-	int parse_b = 0;
-	int parse_f = 0;
+	int parse_c = 0;
+	int parse_v = 0;
 	int parse_h = 0;
 
 	status = optify_init(&pstate->argp, argv, argc);
@@ -162,11 +161,11 @@ catch_known_short_option(void **state)
 			continue;
 
 		switch (status) {
-		case 'b':
-			parse_b = 1;
+		case 'c':
+			parse_c = 1;
 			break;
-		case 'f':
-			parse_f = 1;
+		case 'v':
+			parse_v = 1;
 			break;
 		case 'h':
 			parse_h = 1;
@@ -184,10 +183,26 @@ catch_known_short_option(void **state)
 		}
 	}
 
-	assert_true(parse_b);
-	assert_true(parse_f);
+	assert_true(parse_v);
+	assert_true(parse_c);
 	assert_true(parse_h);
 }
+
+/*
+ * Test if `optify_parse` can properly parse arguments for short options.
+ */
+/* static void */
+/* catch_short_option_arguments(void **state) */
+/* { */
+/* 	struct parser_state *pstate = *state; */
+/* 	char *argv[] = { "test", "foo", "-c", "blue", "bar", "-s", NULL }; */
+/* 	int argc = 6; */
+/* 	int status = 0; */
+
+/* 	status = optify_init(&pstate->argp, argv, argc); */
+/* 	if (status != OPTIFY_SUCCESS) */
+/* 		fail_msg("State initialization failed for some reason"); */
+/* } */
 
 int
 main(void)

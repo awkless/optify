@@ -31,17 +31,14 @@ is_short_option(const char *arg)
 static inline int
 is_option_entry_empty(const struct optify_option *entry)
 {
-	return entry->shortid != 0 && entry->longid != NULL &&
-	       entry->argkind != 0;
+	return entry->shortid == 0 && entry->longid == NULL &&
+	       entry->argkind == 0;
 }
 
 static const struct optify_option *
 get_short_option_entry(const char *arg, const struct optify_option *optlist,
 	               size_t optcnt)
 {
-	const struct optify_option *opt = NULL;
-	const struct optify_option *end = optlist + optcnt;
-
 	if (!arg || !optlist)
 		return NULL;
 
@@ -50,6 +47,8 @@ get_short_option_entry(const char *arg, const struct optify_option *optlist,
 	 *   - Length check takes precedence over NULL termination check in
 	 *     case caller submits an option list with no NULL terminator.
 	 */
+	const struct optify_option *opt = NULL;
+	const struct optify_option *end = optlist + optcnt;
 	for (opt = optlist; opt < end && !is_option_entry_empty(opt); ++opt)
 		if (arg[1] == opt->shortid)
 			return opt;
@@ -83,14 +82,14 @@ optify_parse(struct optify *self, const struct optify_option *optlist, size_t op
 		if (!opt) {
 			self->errarg = arg;
 			/* INVARIANT: Move forward; let caller handle this. */
-			++self->optidx;
+			self->optidx++;
 			return -OPTIFY_UNKNOWN_OPT;
 		}
 
-		++self->optidx;
+		self->optidx++;
 		return opt->shortid;
 	}
 
-	++self->optidx;
+	self->optidx++;
 	return OPTIFY_PARSE_CONTINUE;
 }
