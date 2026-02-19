@@ -6,70 +6,42 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <setjmp.h>
-#include <stdlib.h>
 #include <string.h>
 #include <cmocka.h>
 
 #include <optify.h>
 
 #define OPTCNT 3
-static const struct optify_option optlist_fixture[] = {
+static const struct optify_option optlist[] = {
 	{ .shortid = 'v', .longid = "verbosity", .argkind = OPTIFY_OPTIONAL_ARG },
 	{ .shortid = 'c', .longid = "color", .argkind = OPTIFY_REQUIRED_ARG },
 	{ .shortid = 'h', .longid = "help", .argkind = OPTIFY_NO_ARG },
 	OPTIFY_OPTLIST_END
 };
 
-struct parser_state {
-	struct optify argp;
-	const struct optify_option *optlist;
-};
-
-static int
-setup_parser(void **state)
-{
-	struct parser_state *pstate = malloc(sizeof *pstate);
-	if (!pstate)
-		return 1;
-
-	pstate->argp = (struct optify){ 0 };
-	pstate->optlist = optlist_fixture;
-	*state = pstate;
-
-	return 0;
-}
-
-static int
-teardown_parser(void **state)
-{
-	struct parser_state *pstate = *state;
-	free(pstate);
-	return 0;
-}
-
 static void
 catch_bad_parameters(void **state)
 {
-	struct parser_state *pstate = *state;
+	(void)state;
+	struct optify argp = {0};
 	char *argv[] = { "test", NULL };
 	int argc = 1;
 	int result = 0;
 
-	result = optify_init(&pstate->argp, argv, argc);
+	result = optify_init(&argp, argv, argc);
 	if (result != OPTIFY_OK)
 		fail_msg("State initialization failed for some reason");
 
 	result = optify_parse(NULL, NULL, 0);
 	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
-	result = optify_parse(&pstate->argp, NULL, 0);
+	result = optify_parse(&argp, NULL, 0);
 	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
-	result = optify_parse(NULL, pstate->optlist, OPTCNT);
+	result = optify_parse(NULL, optlist, OPTCNT);
 	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
-	result = optify_parse(&pstate->argp, pstate->optlist, OPTCNT);
+	result = optify_parse(&argp, optlist, OPTCNT);
 	assert_int_equal(result, OPTIFY_PARSE_END);
 }
 
@@ -83,7 +55,8 @@ catch_bad_parameters(void **state)
 static void
 catch_unknown_short_option(void **state)
 {
-	struct parser_state *pstate = *state;
+	(void)state;
+	struct optify argp = {0};
 	char *argv[] = { "test", "foo", "-x", "-h", "bar", "-y", NULL };
 	int argc = 6;
 	int status = 0;
@@ -91,12 +64,12 @@ catch_unknown_short_option(void **state)
 	int catch_x = 0;
 	int catch_y = 0;
 
-	status = optify_init(&pstate->argp, argv, argc);
+	status = optify_init(&argp, argv, argc);
 	if (status != OPTIFY_OK)
 		fail_msg("State initialization failed for some reason");
 
 	for (;;) {
-		status = optify_parse(&pstate->argp, pstate->optlist, OPTCNT);
+		status = optify_parse(&argp, optlist, OPTCNT);
 		if (status == -OPTIFY_ERR_INVALID_PARAM)
 			fail_msg("Invalid parameter(s) passed to parser");
 		if (status == OPTIFY_PARSE_END)
@@ -109,13 +82,13 @@ catch_unknown_short_option(void **state)
 			parse_h = 1;
 			break;
 		case -OPTIFY_ERR_UNKNOWN_OPT:
-			if (strcmp(pstate->argp.errarg, "-x") == 0)
+			if (strcmp(argp.errarg, "-x") == 0)
 				catch_x = 1;
-			if (strcmp(pstate->argp.errarg, "-y") == 0)
+			if (strcmp(argp.errarg, "-y") == 0)
 				catch_y = 1;
 			break;
 		case -OPTIFY_ERR_MISSING_ARG:
-			fail_msg("Missing argument %s", pstate->argp.errarg);
+			fail_msg("Missing argument %s", argp.errarg);
 			break;
 		default:
 			/* SAFETY: Unreachable case but present for sanity. */
@@ -139,7 +112,8 @@ catch_unknown_short_option(void **state)
 static void
 catch_known_short_option(void **state)
 {
-	struct parser_state *pstate = *state;
+	(void)state;
+	struct optify argp = {0};
 	char *argv[] = { "test", "foo", "-v", "-c", "blue", "-h", NULL };
 	int argc = 6;
 	int status = 0;
@@ -147,12 +121,12 @@ catch_known_short_option(void **state)
 	int parse_v = 0;
 	int parse_h = 0;
 
-	status = optify_init(&pstate->argp, argv, argc);
+	status = optify_init(&argp, argv, argc);
 	if (status != OPTIFY_OK)
 		fail_msg("State initialization failed for some reason");
 
 	for (;;) {
-		status = optify_parse(&pstate->argp, pstate->optlist, OPTCNT);
+		status = optify_parse(&argp, optlist, OPTCNT);
 		if (status == -OPTIFY_ERR_INVALID_PARAM)
 			fail_msg("Invalid parameter(s) passed to parser");
 		if (status == OPTIFY_PARSE_END)
@@ -171,10 +145,10 @@ catch_known_short_option(void **state)
 			parse_h = 1;
 			break;
 		case -OPTIFY_ERR_UNKNOWN_OPT:
-			fail_msg("Unknown option %s", pstate->argp.errarg);
+			fail_msg("Unknown option %s", argp.errarg);
 			break;
 		case -OPTIFY_ERR_MISSING_ARG:
-			fail_msg("Missing argument %s", pstate->argp.errarg);
+			fail_msg("Missing argument %s", argp.errarg);
 			break;
 		default:
 			/* SAFETY: Unreachable case but present for sanity. */
@@ -188,33 +162,14 @@ catch_known_short_option(void **state)
 	assert_true(parse_h);
 }
 
-/*
- * Test if `optify_parse` can properly parse arguments for short options.
- */
-/* static void */
-/* catch_short_option_arguments(void **state) */
-/* { */
-/* 	struct parser_state *pstate = *state; */
-/* 	char *argv[] = { "test", "foo", "-c", "blue", "bar", "-s", NULL }; */
-/* 	int argc = 6; */
-/* 	int status = 0; */
-
-/* 	status = optify_init(&pstate->argp, argv, argc); */
-/* 	if (status != OPTIFY_OK) */
-/* 		fail_msg("State initialization failed for some reason"); */
-/* } */
-
 int
 main(void)
 {
 	int result = 0;
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test_setup_teardown(catch_bad_parameters,
-						setup_parser, teardown_parser),
-		cmocka_unit_test_setup_teardown(catch_unknown_short_option,
-						setup_parser, teardown_parser),
-		cmocka_unit_test_setup_teardown(catch_known_short_option,
-						setup_parser, teardown_parser),
+		cmocka_unit_test(catch_bad_parameters),
+		cmocka_unit_test(catch_unknown_short_option),
+		cmocka_unit_test(catch_known_short_option),
 	};
 
 	result = cmocka_run_group_tests(tests, NULL, NULL);
