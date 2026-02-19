@@ -11,7 +11,7 @@
 
 #include <optify.h>
 
-#define OPTCNT 3
+#define OPTLIST_COUNT 3
 static const struct optify_option optlist[] = {
 	{ .shortid = 'v', .longid = "verbosity", .argkind = OPTIFY_OPTIONAL_ARG },
 	{ .shortid = 'c', .longid = "color", .argkind = OPTIFY_REQUIRED_ARG },
@@ -19,11 +19,18 @@ static const struct optify_option optlist[] = {
 	OPTIFY_OPTLIST_END
 };
 
+/*
+ * Test that `optify_parse` checks validity of its parameters.
+ *
+ * Must make sure that `optify_parse` catches the following things:
+ *   - Catches NULL `self` parameter.
+ *   - Catches NULL `optlist` parameter.
+ */
 static void
-catch_bad_parameters(void **state)
+catch_invalid_parameters(void **state)
 {
 	(void)state;
-	struct optify argp = {0};
+	struct optify argp = { 0 };
 	char *argv[] = { "test", NULL };
 	int argc = 1;
 	int result = 0;
@@ -38,25 +45,25 @@ catch_bad_parameters(void **state)
 	result = optify_parse(&argp, NULL, 0);
 	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
-	result = optify_parse(NULL, optlist, OPTCNT);
+	result = optify_parse(NULL, optlist, OPTLIST_COUNT);
 	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
-	result = optify_parse(&argp, optlist, OPTCNT);
+	result = optify_parse(&argp, optlist, OPTLIST_COUNT);
 	assert_int_equal(result, OPTIFY_PARSE_END);
 }
 
 /*
  * Test that `optify_parse` can catch unknown short options.
  *
- * Parser must detect options that do not exist in option entry list. A few
- * positionals are thrown in the mix to ensure that the parser does break
- * when encountering them.
+ * Ensure that `optify_parse` can catch short options that do not exist in
+ * option entry list. However, it should not fail when encountering
+ * positionals.
  */
 static void
-catch_unknown_short_option(void **state)
+catch_unknown_short_options(void **state)
 {
 	(void)state;
-	struct optify argp = {0};
+	struct optify argp = { 0 };
 	char *argv[] = { "test", "foo", "-x", "-h", "bar", "-y", NULL };
 	int argc = 6;
 	int status = 0;
@@ -69,7 +76,7 @@ catch_unknown_short_option(void **state)
 		fail_msg("State initialization failed for some reason");
 
 	for (;;) {
-		status = optify_parse(&argp, optlist, OPTCNT);
+		status = optify_parse(&argp, optlist, OPTLIST_COUNT);
 		if (status == -OPTIFY_ERR_INVALID_PARAM)
 			fail_msg("Invalid parameter(s) passed to parser");
 		if (status == OPTIFY_PARSE_END)
@@ -91,7 +98,7 @@ catch_unknown_short_option(void **state)
 			fail_msg("Missing argument %s", argp.errarg);
 			break;
 		default:
-			/* SAFETY: Unreachable case but present for sanity. */
+			/* SAFETY: Unreachable case, but present for sanity. */
 			fail_msg("Hit unmatched case");
 			break;
 		}
@@ -105,15 +112,15 @@ catch_unknown_short_option(void **state)
 /*
  * Test that `optify_parse` can catch known short options.
  *
- * Parser must detect options known within option entry list. A few positionals
- * are thrown in the mix to make sure that the parser does not panic when
- * encountering them.
+ * Ensure that `optify_parse` can detect short options that do exist in option
+ * entry list. However, `optify_parse` should not fail when encountering
+ * positionals in the mix.
  */
 static void
-catch_known_short_option(void **state)
+catch_known_short_options(void **state)
 {
 	(void)state;
-	struct optify argp = {0};
+	struct optify argp = { 0 };
 	char *argv[] = { "test", "foo", "-v", "-c", "blue", "-h", NULL };
 	int argc = 6;
 	int status = 0;
@@ -126,7 +133,7 @@ catch_known_short_option(void **state)
 		fail_msg("State initialization failed for some reason");
 
 	for (;;) {
-		status = optify_parse(&argp, optlist, OPTCNT);
+		status = optify_parse(&argp, optlist, OPTLIST_COUNT);
 		if (status == -OPTIFY_ERR_INVALID_PARAM)
 			fail_msg("Invalid parameter(s) passed to parser");
 		if (status == OPTIFY_PARSE_END)
@@ -167,9 +174,9 @@ main(void)
 {
 	int result = 0;
 	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(catch_bad_parameters),
-		cmocka_unit_test(catch_unknown_short_option),
-		cmocka_unit_test(catch_known_short_option),
+		cmocka_unit_test(catch_invalid_parameters),
+		cmocka_unit_test(catch_unknown_short_options),
+		cmocka_unit_test(catch_known_short_options),
 	};
 
 	result = cmocka_run_group_tests(tests, NULL, NULL);
