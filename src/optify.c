@@ -10,7 +10,7 @@ int
 optify_init(struct optify *self, char **argv, int argc)
 {
 	if (!self || !argv)
-		return -OPTIFY_BAD_API_USE;
+		return -OPTIFY_ERR_INVALID_PARAM;
 
 	self->argv = argv;
 	self->optarg = NULL;
@@ -19,7 +19,7 @@ optify_init(struct optify *self, char **argv, int argc)
 	/* INVARIANT: Start at argv[1], because argv[0] is the program name. */
 	self->optidx = 1;
 
-	return OPTIFY_SUCCESS;
+	return OPTIFY_OK;
 }
 
 static inline int
@@ -63,7 +63,7 @@ optify_parse(struct optify *self, const struct optify_option *optlist, size_t op
 	char *arg = NULL;
 
 	if (!self || !optlist)
-		return -OPTIFY_BAD_API_USE;
+		return -OPTIFY_ERR_INVALID_PARAM;
 
 	self->optarg = NULL;
 	self->errarg = NULL;
@@ -83,7 +83,7 @@ optify_parse(struct optify *self, const struct optify_option *optlist, size_t op
 			self->errarg = arg;
 			/* INVARIANT: Move forward; let caller handle this. */
 			self->optidx++;
-			return -OPTIFY_UNKNOWN_OPT;
+			return -OPTIFY_ERR_UNKNOWN_OPT;
 		}
 
 		self->optidx++;

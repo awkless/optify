@@ -20,16 +20,16 @@ catch_null_parser_state(void **state)
 	int result = 0;
 
 	result = optify_init(NULL, NULL, 0);
-	assert_int_equal(result, -OPTIFY_BAD_API_USE);
+	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
 	result = optify_init(&pstate, NULL, 0);
-	assert_int_equal(result, -OPTIFY_BAD_API_USE);
+	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
 	result = optify_init(NULL, argv, 1);
-	assert_int_equal(result, -OPTIFY_BAD_API_USE);
+	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
 	result = optify_init(&pstate, argv, 1);
-	assert_int_equal(result, OPTIFY_SUCCESS);
+	assert_int_equal(result, OPTIFY_OK);
 }
 
 int

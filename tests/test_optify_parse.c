@@ -57,17 +57,17 @@ catch_bad_parameters(void **state)
 	int result = 0;
 
 	result = optify_init(&pstate->argp, argv, argc);
-	if (result != OPTIFY_SUCCESS)
+	if (result != OPTIFY_OK)
 		fail_msg("State initialization failed for some reason");
 
 	result = optify_parse(NULL, NULL, 0);
-	assert_int_equal(result, -OPTIFY_BAD_API_USE);
+	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
 	result = optify_parse(&pstate->argp, NULL, 0);
-	assert_int_equal(result, -OPTIFY_BAD_API_USE);
+	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
 	result = optify_parse(NULL, pstate->optlist, OPTCNT);
-	assert_int_equal(result, -OPTIFY_BAD_API_USE);
+	assert_int_equal(result, -OPTIFY_ERR_INVALID_PARAM);
 
 	result = optify_parse(&pstate->argp, pstate->optlist, OPTCNT);
 	assert_int_equal(result, OPTIFY_PARSE_END);
@@ -92,12 +92,12 @@ catch_unknown_short_option(void **state)
 	int catch_y = 0;
 
 	status = optify_init(&pstate->argp, argv, argc);
-	if (status != OPTIFY_SUCCESS)
+	if (status != OPTIFY_OK)
 		fail_msg("State initialization failed for some reason");
 
 	for (;;) {
 		status = optify_parse(&pstate->argp, pstate->optlist, OPTCNT);
-		if (status == -OPTIFY_BAD_API_USE)
+		if (status == -OPTIFY_ERR_INVALID_PARAM)
 			fail_msg("Invalid parameter(s) passed to parser");
 		if (status == OPTIFY_PARSE_END)
 			break;
@@ -108,13 +108,13 @@ catch_unknown_short_option(void **state)
 		case 'h':
 			parse_h = 1;
 			break;
-		case -OPTIFY_UNKNOWN_OPT:
+		case -OPTIFY_ERR_UNKNOWN_OPT:
 			if (strcmp(pstate->argp.errarg, "-x") == 0)
 				catch_x = 1;
 			if (strcmp(pstate->argp.errarg, "-y") == 0)
 				catch_y = 1;
 			break;
-		case -OPTIFY_MISSING_ARG:
+		case -OPTIFY_ERR_MISSING_ARG:
 			fail_msg("Missing argument %s", pstate->argp.errarg);
 			break;
 		default:
@@ -148,12 +148,12 @@ catch_known_short_option(void **state)
 	int parse_h = 0;
 
 	status = optify_init(&pstate->argp, argv, argc);
-	if (status != OPTIFY_SUCCESS)
+	if (status != OPTIFY_OK)
 		fail_msg("State initialization failed for some reason");
 
 	for (;;) {
 		status = optify_parse(&pstate->argp, pstate->optlist, OPTCNT);
-		if (status == -OPTIFY_BAD_API_USE)
+		if (status == -OPTIFY_ERR_INVALID_PARAM)
 			fail_msg("Invalid parameter(s) passed to parser");
 		if (status == OPTIFY_PARSE_END)
 			break;
@@ -170,10 +170,10 @@ catch_known_short_option(void **state)
 		case 'h':
 			parse_h = 1;
 			break;
-		case -OPTIFY_UNKNOWN_OPT:
+		case -OPTIFY_ERR_UNKNOWN_OPT:
 			fail_msg("Unknown option %s", pstate->argp.errarg);
 			break;
-		case -OPTIFY_MISSING_ARG:
+		case -OPTIFY_ERR_MISSING_ARG:
 			fail_msg("Missing argument %s", pstate->argp.errarg);
 			break;
 		default:
@@ -200,7 +200,7 @@ catch_known_short_option(void **state)
 /* 	int status = 0; */
 
 /* 	status = optify_init(&pstate->argp, argv, argc); */
-/* 	if (status != OPTIFY_SUCCESS) */
+/* 	if (status != OPTIFY_OK) */
 /* 		fail_msg("State initialization failed for some reason"); */
 /* } */
 

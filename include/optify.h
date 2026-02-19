@@ -7,7 +7,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 #include <stddef.h>
 
@@ -37,16 +37,16 @@ enum {
 
 enum {
 	/** \brief API call successful, i.e., no errors. */
-	OPTIFY_SUCCESS = 0,
+	OPTIFY_OK = 0,
 
-	/** \brief API was missued, e.g., given NULL parameter. */
-	OPTIFY_BAD_API_USE = 1,
+	/** \brief API was given in invalid parameter. */
+	OPTIFY_ERR_INVALID_PARAM = 1,
 
 	/** \brief Parser encountered an option not in option list. */
-	OPTIFY_UNKNOWN_OPT = 2,
+	OPTIFY_ERR_UNKNOWN_OPT = 2,
 
 	/** \brief Parser encountered an option missing a required argument. */
-	OPTIFY_MISSING_ARG = 3,
+	OPTIFY_ERR_MISSING_ARG = 3,
 };
 
 /**
@@ -110,7 +110,7 @@ struct optify {
  * \param[in] argc _[immutable copy]_ Number of arguments to parse.
  * \param[in] argv _[mutable reference]_ List of arguments to parse.
  * \return Returns `OPTIFY_SUCCESS` for no errors.
- * \return Returns `-OPTIFY_BAD_API_USE` iff `self` or `argv` is NULL.
+ * \return Returns `-OPTIFY_ERR_INVALID_PARAM` iff `self` or `argv` is NULL.
  */
 OPTIFY_EXPORT int
 optify_init(struct optify *self, char **argv, int argc);
@@ -136,17 +136,18 @@ optify_init(struct optify *self, char **argv, int argc);
  * \return Returns `OPTIFY_PARSE_CONTINUE` if it did not detect any options to
  *         parse (may still permute positionals).
  * \return Returns short ID of an option it parsed.
- * \return Returns `-OPTIFY_BAD_API_USE` iff `self` or `optlist` is NULL.
+ * \return Returns `-OPTIFY_ERR_INVALID_PARAM` iff `self` or `optlist` is NULL.
  * \return Returns `-OPTIFY_MISSING_ARG` iff parsed option is missing a
  *         required argument.
  * \return Returns `-OPTIFY_UNKNOWN_OPT` iff detected option does not exist in
  *         option list.
  */
 OPTIFY_EXPORT int
-optify_parse(struct optify *self, const struct optify_option *optlist, size_t optcnt);
+optify_parse(struct optify *self, const struct optify_option *optlist,
+	     size_t optcnt);
 
 #ifdef __cplusplus
 } /* extern "C" */
-#endif
+#endif /* __cplusplus */
 
 #endif /* OPTIFY_H */
