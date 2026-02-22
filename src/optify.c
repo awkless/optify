@@ -113,16 +113,16 @@ optify_parse(struct optify *self, const struct optify_option *optlist, size_t op
 
 	self->optarg = NULL;
 	self->errarg = NULL;
-	arg = self->argv[self->optidx];
 
 	/*
 	 * INVARIANT: Stop parsing iff we reach the end of argv.
 	 *   - C standard ensures argv is NULL terminated so length check is
 	 *     technically redundant, but I am very paranoid :3
 	 */
-	if (!arg || self->optidx == self->argc)
+	if (self->optidx >= self->argc || !self->argv[self->optidx])
 		return OPTIFY_PARSE_END;
 
+	arg = self->argv[self->optidx];
 	if (is_short_option(arg)) {
 		opt = get_short_option_entry(arg, optlist, optcnt);
 		if (!opt) {
