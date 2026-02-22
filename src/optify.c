@@ -25,7 +25,13 @@ optify_init(struct optify *self, char **argv, int argc)
 static inline int
 is_short_option(const char *arg)
 {
-	return arg != NULL && arg[0] == '-' && arg[1] != '-' && arg[1] != '\0';
+	return arg && arg[0] == '-' && arg[1] != '-' && arg[1] != '\0';
+}
+
+static int
+is_positional(const char *arg)
+{
+	return arg && arg[0] != '-' && arg[0] != '\0';
 }
 
 static inline int
@@ -56,11 +62,51 @@ get_short_option_entry(const char *arg, const struct optify_option *optlist,
 	return NULL;
 }
 
+static int
+parse_option_arg(struct optify *self, char *arg, int argkind)
+{
+	int peek_pos = 0;
+	char *peek_arg = NULL;
+
+	if (!self)
+		return -OPTIFY_ERR_INVALID_PARAM;
+
+	if (argkind == OPTIFY_NO_ARG)
+		return OPTIFY_OK;
+
+	peek_pos = self->optidx + 1;
+	peek_arg = self->argv[peek_pos];
+
+	if (argkind == OPTIFY_REQUIRED_ARG) {
+		if (peek_pos >= self->argc || !peek_arg || !is_positional(peek_arg)) {
+			self->errarg = arg;
+			self->optarg = NULL;
+			self->optidx = peek_pos;
+			return -OPTIFY_ERR_MISSING_ARG;
+		}
+
+	}
+
+	if (argkind == OPTIFY_OPTIONAL_ARG) {
+		if (peek_pos >= self->argc || !peek_arg || !is_positional(peek_arg)) {
+			self->errarg = NULL;
+			self->optarg = NULL;
+			return OPTIFY_OK;
+		}
+	}
+
+	self->optarg = peek_arg;
+	self->optidx = peek_pos;
+
+	return OPTIFY_OK;
+}
+
 int
 optify_parse(struct optify *self, const struct optify_option *optlist, size_t optcnt)
 {
 	const struct optify_option *opt = NULL;
 	char *arg = NULL;
+	int status = OPTIFY_OK;
 
 	if (!self || !optlist)
 		return -OPTIFY_ERR_INVALID_PARAM;
@@ -86,10 +132,15 @@ optify_parse(struct optify *self, const struct optify_option *optlist, size_t op
 			return -OPTIFY_ERR_UNKNOWN_OPT;
 		}
 
+		status = parse_option_arg(self, arg, opt->argkind);
+		if (status != OPTIFY_OK)
+			return status;
+
 		self->optidx++;
 		return opt->shortid;
 	}
 
 	self->optidx++;
+
 	return OPTIFY_PARSE_CONTINUE;
 }
